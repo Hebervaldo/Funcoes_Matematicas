@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usuario="Hebervaldo"
-token="$(cat '"'/home/usuario/Documentos/git/$usuario/Token_Git_Hebervaldo.txt'"')"
+token="$(cat '/home/usuario/Documentos/git/$usuario/Token_Git_Hebervaldo.txt')"
 nome_repositorio="Funcoes_Matematicas"
 
 for n in *.c
