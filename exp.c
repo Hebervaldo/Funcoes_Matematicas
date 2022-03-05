@@ -3,8 +3,10 @@
 #include <stdlib.h> 
 #include <sys/time.h>
 
-#define err_c 1.0e-100
-#define exp_c 2.718281828459045235360287471352662497757
+#define err_c 		1.0e-100
+#define exp_c		2.718281828459045235360287471352662497757
+#define ln10_c		2.302585092994045901093613792909309267997
+#define invln10_c	.4342944819032517867168474018368939937317
 
 long tInicial, tFinal, tTempoDecorrido;
 
@@ -61,14 +63,22 @@ long double mtdCalcularExponencial(long double x)
 
 	FILE *cfPtr;
 
+	mtdCronometroIniciar();
+
+	long double xn = (x * invln10_c);
+
+	long double axn = mtdObterValorAbsoluto(xn);
+	long double ixn = (long double)((int) xn);
+	long double aixn = mtdObterValorAbsoluto(ixn);
+	long double afxn = (axn - aixn);
+	long double xe = afxn * ln10_c;
+
 	int j = 1;
 	long double oldr = 0;
-	long double r = 1 + x;
+	long double r = 1 + xe;
 	long double div = 1;
-	long double m = x;
+	long double m = xe;
 	long double err = mtdObterValorAbsoluto(r - oldr);
-
-	mtdCronometroIniciar();
 
 	if (x != 0)
 	{
@@ -76,10 +86,35 @@ long double mtdCalcularExponencial(long double x)
 		{
 			j = j + 1;
 			div = div * j;
-			m = m * x;
+			m = m * xe;
 			oldr = r;
 			r = r + (m / div);
 			err = mtdObterValorAbsoluto(r - oldr);
+		}
+
+		long double sixn = (ixn / aixn);
+		long double r10n = 1;
+
+		if (aixn > 0)
+		{
+			for(int i = 0; i <= (aixn - 1); i++)
+			{
+				r10n = r10n * 10;
+			}
+			
+			if(axn >= 1)
+			{
+				r = r * r10n;
+			}
+			else
+			{
+				r = (r / r10n);
+			}
+		}
+
+		if (x < 0)
+		{
+			r = (1 / r);
 		}
 
 		Retorno = r;
@@ -111,25 +146,59 @@ long double mtdCalcularExponencial_n(long double x, int n)
 
 	FILE *cfPtr;
 
-	long double oldr = 0;
-	long double r = 1 + x;
-	long double div = 1;
-	long double m = x;
-	long double err = 0;
-
 	mtdCronometroIniciar();
+
+	long double xn = (x * invln10_c);
+
+	long double axn = mtdObterValorAbsoluto(xn);
+	long double ixn = (long double)((int) xn);
+	long double aixn = mtdObterValorAbsoluto(ixn);
+	long double afxn = (axn - aixn);
+	long double xe = afxn * ln10_c;
+
+	long double oldr = 0;
+	long double r = 1 + xe;
+	long double div = 1;
+	long double m = xe;
+	long double err = 0;
+	long double exp_maiorexatidao = mtdCalcularExponencial(x);
 
 	if (x != 0)
 	{
 		for (int j = 2; j <= (n + 1); j++)
 		{
 			div = div * j;
-			m = m * x;
+			m = m * xe;
 			oldr = r;
 			r = r + (m / div);
+			err = mtdObterValorAbsoluto(r - exp_maiorexatidao);
 		}
 
-		err = mtdObterValorAbsoluto(r - mtdCalcularExponencial(x));
+		long double sixn = (ixn / aixn);
+		long double r10n = 1;
+
+		if (aixn > 0)
+		{
+			for(int i = 0; i < aixn; i++)
+			{
+				r10n = r10n * 10;
+			}
+			
+			if(axn >= 1)
+			{
+				r = r * r10n;
+			}
+			else
+			{
+				r = (r / r10n);
+			}
+		}
+
+		if (x < 0)
+		{
+			r = (1 / r);
+		}
+
 		Retorno = r;
 	}
 	else
