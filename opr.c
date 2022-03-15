@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 					cx = cx + 1;
 				}
 
-				if (chr[cchr] == ',' || chr[cchr] == '+' || chr[cchr] == '-' || chr[cchr] == '*' || chr[cchr] == '/')
+				if (chr[cchr] == ',' || chr[cchr] == '+' || chr[cchr] == '-' || chr[cchr] == '*' || chr[cchr] == '/' || chr[cchr] == '^')
 				{
 					bx = 0;
 					by = 1;
