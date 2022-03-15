@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define CONSTANTE_TIPO_NUMERO_DIGITOS "%.18Lf\n"
+#define TIPO_OPERACAO_GENERICA "opr"
 #define TIPO_OPERACAO_ADICAO "add"
 #define TIPO_OPERACAO_SUBTRACAO "sub"
 #define TIPO_OPERACAO_MULTIPLICACAO "mul"
@@ -14,25 +15,37 @@ int strContains(char* string, char* toFind)
     int tFlen = strlen(toFind);
     int found = 0;
 
-    if( slen >= tFlen )
+    if(slen >= tFlen)
     {
         for(int s=0, t=0; s<slen; s++)
         {
-            do{
-
-                if( string[s] == toFind[t] )
+            do
+			{
+                if(string[s] == toFind[t])
                 {
-                    if( ++found == tFlen ) return 1;
+                    if(++found == tFlen) 
+					{
+						return 1;
+					}
                     s++;
                     t++;
                 }
-                else { s -= found; found=0; t=0; }
+                else
+				{
+					s -= found;
+					found=0;
+					t=0;
+				}
 
-              }while(found);
+              }
+			  while(found);
         }
         return 0;
     }
-    else return -1;
+    else 
+	{
+		return -1;
+	}
 }
 
 long double mtdOperarAdicao(long double x, long double y)
@@ -86,6 +99,11 @@ long double mtdResultadoOperacao(char *operacao, long double x, long double y)
 {
 	long double Retorno;
 
+	if (operacao == TIPO_OPERACAO_GENERICA)
+	{
+		Retorno = mtdOperarAdicao(x, y);
+	}
+
 	if (operacao == TIPO_OPERACAO_ADICAO)
 	{
 		Retorno = mtdOperarAdicao(x, y);
@@ -123,113 +141,113 @@ int main(int argc, char *argv[])
 
     switch (argc)
 	{
-	case 1:
-		if (operacao == TIPO_OPERACAO_ADICAO)
+		case 1:
+			if (operacao == TIPO_OPERACAO_ADICAO)
+			{
+				cfPtr = fopen("add.input", "r");
+			}
+			if (operacao == TIPO_OPERACAO_SUBTRACAO)
+			{
+				cfPtr = fopen("sub.input", "r");
+			}
+			if (operacao == TIPO_OPERACAO_MULTIPLICACAO)
+			{
+				cfPtr = fopen("mul.input", "r");
+			}
+			if (operacao == TIPO_OPERACAO_DIVISAO)
+			{
+				cfPtr = fopen("div.input", "r");
+			}
+
+			fscanf(cfPtr, "%Lf", &x);
+			fscanf(cfPtr, "%Lf", &y);
+		break;
+		case 2:
 		{
-			cfPtr = fopen("add.input", "r");
+			char *chr = argv[1];
+			int cchr = 0;
+			char *xc;
+			char *yc;
+
+			int pix = 0;
+			int piy = 0;
+
+			int bx = 0;
+			int by = 0;
+
+			int cx = 0;
+			int cy = 0;
+
+			while (bx != -1 && by != -1)
+			{
+				if (chr[cchr] == '(')
+				{
+					bx = 1;	
+					by = 0;
+					pix = cchr + 1;
+				}
+
+				if (bx == 1 && by == 0)
+				{
+					cx = cx + 1;
+				}
+
+				if (chr[cchr] == ',')
+				{
+					bx = 0;
+					by = 1;
+					piy = cchr + 1;
+					cx = cx - 1;
+				}
+
+				if (bx == 0 && by == 1)
+				{
+					cy = cy + 1;
+				}
+
+				if (chr[cchr] == ')')
+				{
+					bx = -1;
+					by = -1;
+					cy = cy - 1;
+				}
+
+				cchr = cchr + 1;
+			}
+
+			xc = (char *)malloc((cx + 1) * sizeof(char));
+			yc = (char *)malloc((cy + 1) * sizeof(char));
+
+			int j = 0;
+			int k = 0;
+
+			for (int i = 0; i < cchr; i++)
+			{
+				if (i >= pix && i < pix + cx - 1)
+				{
+					xc[j] = chr[i];
+					j = j + 1;
+				}
+				
+				if (i >= piy && i < piy + cy - 1)
+				{
+					yc[k] = chr[i]; 
+					k = k + 1;
+				}
+			}
+
+			x = atof(xc);
+			y = atof(yc);
 		}
-		if (operacao == TIPO_OPERACAO_SUBTRACAO)
-		{
-			cfPtr = fopen("sub.input", "r");
-		}
-		if (operacao == TIPO_OPERACAO_MULTIPLICACAO)
-		{
-			cfPtr = fopen("mul.input", "r");
-		}
-		if (operacao == TIPO_OPERACAO_DIVISAO)
-		{
-			cfPtr = fopen("div.input", "r");
-		}
-
-        fscanf(cfPtr, "%Lf", &x);
-        fscanf(cfPtr, "%Lf", &y);
-    break;
-	case 2:
-	{
-        char *chr = argv[1];
-		int cchr = 0;
-        char *xc;
-        char *yc;
-
-		int pix = 0;
-		int piy = 0;
-
-		int bx = 0;
-		int by = 0;
-
-		int cx = 0;
-		int cy = 0;
-
-		while (bx != -1 && by != -1)
-		{
-			if (chr[cchr] == '(')
-			{
-				bx = 1;	
-				by = 0;
-				pix = cchr + 1;
-			}
-
-			if (bx == 1 && by == 0)
-			{
-				cx = cx + 1;
-			}
-
-			if (chr[cchr] == ',')
-			{
-				bx = 0;
-				by = 1;
-				piy = cchr + 1;
-				cx = cx - 1;
-			}
-
-			if (bx == 0 && by == 1)
-			{
-				cy = cy + 1;
-			}
-
-			if (chr[cchr] == ')')
-			{
-				bx = -1;
-				by = -1;
-				cy = cy - 1;
-			}
-
-			cchr = cchr + 1;
-		}
-
-		xc = (char *)malloc((cx + 1) * sizeof(char));
-		yc = (char *)malloc((cy + 1) * sizeof(char));
-
-		int j = 0;
-		int k = 0;
-
-		for (int i = 0; i < cchr; i++)
-		{
-			if (i >= pix && i < pix + cx - 1)
-			{
-				xc[j] = chr[i];
-				j = j + 1;
-			}
-			
-			if (i >= piy && i < piy + cy - 1)
-			{
-				yc[k] = chr[i]; 
-				k = k + 1;
-			}
-		}
-
-        x = atof(xc);
-        y = atof(yc);
-	}
-    break;
-	case 3:
-        x = atof(argv[1]);
-        y = atof(argv[2]);
-	break;
-	default:
-		printf("%s: numero invalido de argumentos.\n", operacao);
-		return 0;
-	break;
+		break;
+		case 3:
+			x = atof(argv[1]);
+			y = atof(argv[2]);
+		break;
+		default:
+			printf("%s: numero invalido de argumentos.\n", operacao);
+			return 0;
+		break;
 	}
 
 	Resultado = mtdResultadoOperacao(operacao, x, y);
