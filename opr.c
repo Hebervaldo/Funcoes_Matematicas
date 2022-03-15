@@ -8,6 +8,12 @@
 #define TIPO_OPERACAO_SUBTRACAO "sub"
 #define TIPO_OPERACAO_MULTIPLICACAO "mul"
 #define TIPO_OPERACAO_DIVISAO "div"
+#define TIPO_OPERACAO_POTENCIACAO "pot"
+
+#define err_c 		1.0e-100
+#define exp_c		2.718281828459045235360287471352662497757
+#define ln10_c		2.302585092994045901093613792909309267997
+#define invln10_c	.4342944819032517867168474018368939937317
 
 int strContains(char* string, char* toFind)
 {
@@ -48,6 +54,155 @@ int strContains(char* string, char* toFind)
 	}
 }
 
+long double mtdObterValorAbsoluto(long double x)
+{
+	long double Retorno = 0;
+
+	if (x >= 0)
+	{
+		Retorno = x;
+	}
+	else
+	{
+		Retorno = -1 * x;
+	}
+
+	return Retorno;
+}
+
+long double mtdCalcularExponencial(long double x)
+{
+	long double Retorno = 0;
+
+	FILE *cfPtr;
+
+	long double xn = (x * invln10_c);
+
+	long double axn = mtdObterValorAbsoluto(xn);
+	long double ixn = (long double)((int) xn);
+	long double aixn = mtdObterValorAbsoluto(ixn);
+	long double afxn = (axn - aixn);
+	long double xe = afxn * ln10_c;
+
+	int j = 1;
+	long double oldr = 0;
+	long double r = 1 + xe;
+	long double div = 1;
+	long double m = xe;
+	long double err = r;
+
+	if (x != 0)
+	{
+		while (err > err_c)
+		{
+			j = j + 1;
+			div = div * j;
+			m = m * xe;
+			oldr = r;
+			r = r + (m / div);
+			err = mtdObterValorAbsoluto(r - oldr);
+		}
+
+		long double sixn = (ixn / aixn);
+		long double r10n = 1;
+
+		if (aixn > 0)
+		{
+			for(int i = 0; i <= (aixn - 1); i++)
+			{
+				r10n = r10n * 10;
+			}
+			
+			if(axn >= 1)
+			{
+				r = r * r10n;
+			}
+			else
+			{
+				r = (r / r10n);
+			}
+		}
+
+		if (x < 0)
+		{
+			r = (1 / r);
+		}
+
+		Retorno = r;
+	}
+	else
+	{
+		j = 0;
+		err = 0;
+		Retorno = 1;
+	}
+	
+	return Retorno;
+}
+
+long double mtdCalcularLogaritmoNatural(long double x)
+{
+	long double Retorno = 0;
+
+	FILE *cfPtr;
+
+	int i = 0;
+	int j = 1;
+	int signal = 1;
+    long double xn = x;
+    long double axn = mtdObterValorAbsoluto(xn);
+	long double xe = axn;
+	long double r = xe;
+	long double m = xe;
+	long double oldr = 0;
+	long double div = 1;
+	long double exp = exp_c;
+	long double err = r;
+
+	if (x > 0)
+	{
+		if (x >= 1)
+		{
+			signal = 1;
+		}
+		else
+		{
+			xe = 1 / xe;
+			signal = -1;
+		}
+
+		while (xe >= 1)
+		{
+			xe = xe / exp;
+			i = i + 1;
+		}
+
+		xe = ((xe - 1) / (xe + 1));
+		r = xe;
+		m = xe;
+
+		while (err > err_c)
+		{
+			m = m * (xe * xe);
+			oldr = r;
+			div = div + 2;
+			r = r + (m / div);
+			j = j + 1;
+			err = mtdObterValorAbsoluto(r - oldr);
+		}
+
+		Retorno = (signal * (i + 2 * r));
+	}
+	else
+	{
+		j = 0;
+		err = 0;
+		Retorno = 0;
+	}
+
+	return Retorno;
+}
+
 long double mtdOperarAdicao(long double x, long double y)
 {
 	return x + y;
@@ -68,6 +223,11 @@ long double mtdOperarDivisao(long double x, long double y)
 	return x / y;
 }
 
+long double mtdOperarPotenciacao(long double x, long double y)
+{
+	return (mtdCalcularExponencial((x * mtdCalcularLogaritmoNatural(y))));
+}
+
 long double mtdOperarGenerico(char operador, long double x, long double y)
 {
 	long double Resultado = 0;
@@ -85,6 +245,9 @@ long double mtdOperarGenerico(char operador, long double x, long double y)
 		break;
 		case '/':
 			Resultado = mtdOperarDivisao(x, y);
+		break;
+		case '^':
+			Resultado = mtdOperarPotenciacao(x, y);
 		break;
 	}
 
@@ -120,6 +283,11 @@ char *mtdDefinirOperacao(char *Entrada)
 		Retorno = TIPO_OPERACAO_DIVISAO;
 	}
 
+	if (strContains(Entrada, TIPO_OPERACAO_POTENCIACAO))
+	{
+		Retorno = TIPO_OPERACAO_POTENCIACAO;
+	}
+
 	return Retorno;
 }
 
@@ -150,6 +318,11 @@ long double mtdResultadoOperacao(char *operacao, char operador, long double x, l
 	if (operacao == TIPO_OPERACAO_DIVISAO)
 	{
 		Retorno = mtdOperarDivisao(x, y);
+	}
+
+	if (operacao == TIPO_OPERACAO_POTENCIACAO)
+	{
+		Retorno = mtdOperarPotenciacao(x, y);
 	}
 
 	return Retorno;
@@ -190,6 +363,10 @@ int main(int argc, char *argv[])
 			if (operacao == TIPO_OPERACAO_DIVISAO)
 			{
 				cfPtr = fopen("div.input", "r");
+			}
+			if (operacao == TIPO_OPERACAO_POTENCIACAO)
+			{
+				cfPtr = fopen("pot.input", "r");
 			}
 
 			fscanf(cfPtr, "%Lf", &x);
@@ -324,6 +501,10 @@ int main(int argc, char *argv[])
 	if (operacao == TIPO_OPERACAO_DIVISAO)
 	{
 		cfPtr = fopen("div.result", "w");
+	}
+	if (operacao == TIPO_OPERACAO_POTENCIACAO)
+	{
+		cfPtr = fopen("pot.result", "w");
 	}
 
 	fprintf(cfPtr, CONSTANTE_TIPO_NUMERO_DIGITOS, Resultado);

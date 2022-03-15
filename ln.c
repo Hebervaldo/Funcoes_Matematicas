@@ -3,8 +3,8 @@
 #include <stdlib.h> 
 #include <sys/time.h>
 
-#define err_c 1.0e-100
-#define exp_c 2.718281828459045235360287471352662497757;
+#define err_c	1.0e-100
+#define exp_c	2.718281828459045235360287471352662497757
 
 long tInicial, tFinal, tTempoDecorrido;
 
