@@ -235,6 +235,7 @@ int main(int argc, char *argv[])
 					by = 1;
 					piy = cchr + 1;
 					cx = cx - 1;
+					
 					if(chr[cchr] != ',')
 					{
 						operador = chr[cchr];
