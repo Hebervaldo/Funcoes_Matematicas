@@ -68,9 +68,37 @@ long double mtdOperarDivisao(long double x, long double y)
 	return x / y;
 }
 
+long double mtdOperarGenerico(char operador, long double x, long double y)
+{
+	long double Resultado = 0;
+
+	switch (operador)
+	{
+		case '+':
+			Resultado = mtdOperarAdicao(x, y);
+		break;
+		case '-':
+			Resultado = mtdOperarSubtracao(x, y);
+		break;
+		case '*':
+			Resultado = mtdOperarMultiplicacao(x, y);
+		break;
+		case '/':
+			Resultado = mtdOperarDivisao(x, y);
+		break;
+	}
+
+	return Resultado;
+}
+
 char *mtdDefinirOperacao(char *Entrada)
 {
 	char *Retorno;
+
+	if (strContains(Entrada, TIPO_OPERACAO_GENERICA))
+	{
+		Retorno = TIPO_OPERACAO_GENERICA;
+	}
 
 	if (strContains(Entrada, TIPO_OPERACAO_ADICAO))
 	{
@@ -95,13 +123,13 @@ char *mtdDefinirOperacao(char *Entrada)
 	return Retorno;
 }
 
-long double mtdResultadoOperacao(char *operacao, long double x, long double y)
+long double mtdResultadoOperacao(char *operacao, char operador, long double x, long double y)
 {
 	long double Retorno;
 
 	if (operacao == TIPO_OPERACAO_GENERICA)
 	{
-		Retorno = mtdOperarAdicao(x, y);
+		Retorno = mtdOperarGenerico(operador, x, y);
 	}
 
 	if (operacao == TIPO_OPERACAO_ADICAO)
@@ -138,10 +166,15 @@ int main(int argc, char *argv[])
 	char *comando;
 	comando = argv[0];
 	char *operacao = mtdDefinirOperacao(comando);
+	char operador;
 
     switch (argc)
 	{
 		case 1:
+			if (operacao == TIPO_OPERACAO_GENERICA)
+			{
+				cfPtr = fopen("opr.input", "r");
+			}
 			if (operacao == TIPO_OPERACAO_ADICAO)
 			{
 				cfPtr = fopen("add.input", "r");
@@ -160,6 +193,10 @@ int main(int argc, char *argv[])
 			}
 
 			fscanf(cfPtr, "%Lf", &x);
+			if (operacao == TIPO_OPERACAO_GENERICA)
+			{
+				fscanf(cfPtr, "%s", &operador);
+			}
 			fscanf(cfPtr, "%Lf", &y);
 		break;
 		case 2:
@@ -192,12 +229,16 @@ int main(int argc, char *argv[])
 					cx = cx + 1;
 				}
 
-				if (chr[cchr] == ',')
+				if (chr[cchr] == ',' || chr[cchr] == '+' || chr[cchr] == '-' || chr[cchr] == '*' || chr[cchr] == '/')
 				{
 					bx = 0;
 					by = 1;
 					piy = cchr + 1;
 					cx = cx - 1;
+					if(chr[cchr] != ',')
+					{
+						operador = chr[cchr];
+					}
 				}
 
 				if (bx == 0 && by == 1)
@@ -244,31 +285,44 @@ int main(int argc, char *argv[])
 			x = atof(argv[1]);
 			y = atof(argv[2]);
 		break;
+		case 4:
+			x = atof(argv[1]);
+			operador = argv[2][0];
+			y = atof(argv[3]);
+		break;
 		default:
 			printf("%s: numero invalido de argumentos.\n", operacao);
 			return 0;
 		break;
 	}
 
-	Resultado = mtdResultadoOperacao(operacao, x, y);
+	Resultado = mtdResultadoOperacao(operacao, operador, x, y);
 
+	if (operacao == TIPO_OPERACAO_GENERICA)
+	{
+		printf("(Operacao: %c)\t", operador);
+	}
 	printf(CONSTANTE_TIPO_NUMERO_DIGITOS, Resultado);
 
+	if (operacao == TIPO_OPERACAO_GENERICA)
+	{
+		cfPtr = fopen("opr.result", "w");
+	}
 	if (operacao == TIPO_OPERACAO_ADICAO)
 	{
-	cfPtr = fopen("add.result", "w");
+		cfPtr = fopen("add.result", "w");
 	}
 	if (operacao == TIPO_OPERACAO_SUBTRACAO)
 	{
-	cfPtr = fopen("sub.result", "w");
+		cfPtr = fopen("sub.result", "w");
 	}
 	if (operacao == TIPO_OPERACAO_MULTIPLICACAO)
 	{
-	cfPtr = fopen("mul.result", "w");
+		cfPtr = fopen("mul.result", "w");
 	}
 	if (operacao == TIPO_OPERACAO_DIVISAO)
 	{
-	cfPtr = fopen("div.result", "w");
+		cfPtr = fopen("div.result", "w");
 	}
 
 	fprintf(cfPtr, CONSTANTE_TIPO_NUMERO_DIGITOS, Resultado);
