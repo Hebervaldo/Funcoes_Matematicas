@@ -78,7 +78,7 @@ long double mtdCalcularExponencial(long double x)
 	long double r = 1 + xe;
 	long double div = 1;
 	long double m = xe;
-	long double err = mtdObterValorAbsoluto(r - oldr);
+	long double err = r;
 
 	if (x != 0)
 	{
@@ -128,6 +128,8 @@ long double mtdCalcularExponencial(long double x)
 
 	mtdCronometroParar();
 	
+	cfPtr = fopen("exp.result", "w");
+	fprintf(cfPtr, "%.100Lfn", Retorno);
 	cfPtr = fopen("exp.loop", "w");
 	fprintf(cfPtr, "%d\n", (j - 1));
 	cfPtr = fopen("exp.error", "w");
@@ -209,6 +211,8 @@ long double mtdCalcularExponencial_n(long double x, int n)
 
 	mtdCronometroParar();
 
+	cfPtr = fopen("exp.result", "w");
+	fprintf(cfPtr, "%.100Lfn", Retorno);
 	cfPtr = fopen("exp.loop", "w");
 	fprintf(cfPtr, "%d\n", n);
 	cfPtr = fopen("exp.erro", "w");

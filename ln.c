@@ -65,39 +65,50 @@ long double mtdCalcularLogaritmoNatural(long double x)
 	int j = 1;
 	int signal = 1;
     long double xn = x;
-	long double r = x;
-	long double m = x;
+    long double axn = mtdObterValorAbsoluto(xn);
+	long double xe = axn;
+	long double r = xe;
+	long double m = xe;
 	long double oldr = 0;
 	long double div = 1;
 	long double exp = exp_c;
-	long double err = mtdObterValorAbsoluto(r - oldr);
+	long double err = r;
 
 	mtdCronometroIniciar();
 
-	if (x != 1)
+	if (x > 0)
 	{
-		while (mtdObterValorAbsoluto(xn) >= 1)
+		if (x >= 1)
 		{
-			xn = xn / exp;
+			signal = 1;
+		}
+		else
+		{
+			xe = 1 / xe;
+			signal = -1;
+		}
+
+		while (xe >= 1)
+		{
+			xe = xe / exp;
 			i = i + 1;
 		}
 
-		xn = xn - 1;
-		r = xn;
-		m = xn;
+		xe = ((xe - 1) / (xe + 1));
+		r = xe;
+		m = xe;
 
 		while (err > err_c)
 		{
-			m = m * xn;
+			m = m * (xe * xe);
 			oldr = r;
-			signal = signal * -1;
-			div = div + 1;
-			r = r + (signal * m / div);
+			div = div + 2;
+			r = r + (m / div);
 			j = j + 1;
 			err = mtdObterValorAbsoluto(r - oldr);
 		}
 
-		Retorno = (i + r);
+		Retorno = (signal * (i + 2 * r));
 	}
 	else
 	{
@@ -108,13 +119,16 @@ long double mtdCalcularLogaritmoNatural(long double x)
 
 	mtdCronometroParar();
 
+	cfPtr = fopen("ln.result", "w");
+	fprintf(cfPtr, "%.100Lfn", Retorno);
 	cfPtr = fopen("ln.loop", "w");
 	fprintf(cfPtr, "%d\n", (j - 1));
 	cfPtr = fopen("ln.erro", "w");
 	fprintf(cfPtr, "%.100Lf\n", err);
-	fclose(cfPtr);
 	cfPtr = fopen("ln.time", "w");
 	fprintf(cfPtr, "%ld us\n", mtdCronometroTempoDecorrido());
+	
+	fclose(cfPtr);
 
 	return Retorno;
 }
@@ -128,47 +142,62 @@ long double mtdCalcularLogaritmoNatural_n(long double x, int n)
 	int i = 0;
 	int signal = 1;
     long double xn = x;
+    long double axn = mtdObterValorAbsoluto(xn);
+	long double xe = axn;
 	long double r = x;
 	long double m = x;
 	long double oldr = 0;
 	long double div = 1;
 	long double exp = exp_c;
-	long double err = err_c;
+	long double err = 0;
+	long double ln_maiorexatidao = mtdCalcularLogaritmoNatural(x);
 
 	mtdCronometroIniciar();
 
-	if (x != 1)
+	if (x > 0)
 	{
-		while (mtdObterValorAbsoluto(xn) >= 1)
+		if (x >= 1)
 		{
-			xn = xn / exp;
+			signal = 1;
+		}
+		else
+		{
+			xe = 1 / xe;
+			signal = -1;
+		}
+
+		while (xe >= 1)
+		{
+			xe = xe / exp;
 			i = i + 1;
 		}
 
-		xn = xn - 1;
-		r = xn;
-		m = xn;
+		xe = ((xe - 1) / (xe + 1));
+		r = xe;
+		m = xe;
 
 		for (int j = 2; j <= (n + 1); j++)
 		{
-			m = m * xn;
+			m = m * (xe * xe);
 			oldr = r;
-			signal = signal * -1;
-			div = div + 1;
-			r = r + (signal * m / div);
+			div = div + 2;
+			r = r + (m / div);
+			err = mtdObterValorAbsoluto(r - oldr);
 		}
-	
-		err = mtdObterValorAbsoluto((i + r) - mtdCalcularLogaritmoNatural(x));
-		Retorno = (i + r);
+
+		Retorno = (signal * (i + 2 * r));
+		err = mtdObterValorAbsoluto(Retorno - ln_maiorexatidao);
 	}
 	else
 	{
 		err = 0;
 		Retorno = 0;
 	}
-
+	
 	mtdCronometroParar();
 
+	cfPtr = fopen("ln.result", "w");
+	fprintf(cfPtr, "%.100Lfn", Retorno);
 	cfPtr = fopen("ln.loop", "w");
 	fprintf(cfPtr, "%d\n", n);
 	cfPtr = fopen("ln.erro", "w");
