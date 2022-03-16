@@ -23,7 +23,7 @@ int strContains(char* string, char* toFind)
 
     if(slen >= tFlen)
     {
-        for(int s=0, t=0; s<slen; s++)
+        for(int s = 0, t = 0; s < slen; s++)
         {
             do
 			{
@@ -39,8 +39,8 @@ int strContains(char* string, char* toFind)
                 else
 				{
 					s -= found;
-					found=0;
-					t=0;
+					found = 0;
+					t = 0;
 				}
 
               }
@@ -68,6 +68,11 @@ long double mtdObterValorAbsoluto(long double x)
 	}
 
 	return Retorno;
+}
+
+short int mtdObterSinal(long double x)
+{
+	return (short int) (x / mtdObterValorAbsoluto(x));
 }
 
 long double mtdCalcularExponencial(long double x)
@@ -225,7 +230,18 @@ long double mtdOperarDivisao(long double x, long double y)
 
 long double mtdOperarPotenciacao(long double x, long double y)
 {
-	return (mtdCalcularExponencial((x * mtdCalcularLogaritmoNatural(y))));
+	long double Retorno = 0;
+
+	if (x >= 0)
+	{
+		Retorno = (mtdCalcularExponencial(y * mtdCalcularLogaritmoNatural(x)));
+	}
+	else
+	{
+		Retorno = 0;
+	}
+
+	return Retorno;
 }
 
 long double mtdOperarGenerico(char operador, long double x, long double y)
@@ -478,13 +494,14 @@ int main(int argc, char *argv[])
 
 	if (operacao == TIPO_OPERACAO_GENERICA)
 	{
-		printf("(Operacao: %c)\t", operador);
+		printf("(%c)\t", operador);
 	}
 	printf(CONSTANTE_TIPO_NUMERO_DIGITOS, Resultado);
 
 	if (operacao == TIPO_OPERACAO_GENERICA)
 	{
 		cfPtr = fopen("opr.result", "w");
+		fprintf(cfPtr, "(%c)\t", operador);
 	}
 	if (operacao == TIPO_OPERACAO_ADICAO)
 	{
